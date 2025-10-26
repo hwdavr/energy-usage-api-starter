@@ -15,17 +15,9 @@ services:
       DATABASE_URL: postgres://postgres:postgres@db:5432/energy?sslmode=disable
       JWT_SECRET: devsecret-change-me
       ADDR: :8080
+      PHOTO_UPLOAD_DIR: /app/uploads
     ports: ["8080:8080"]
-  app:
-    build: .
-    container_name: energy-usage-app
-    env_file:
-      - .env
-    environment:
-      - PHOTO_UPLOAD_DIR=/app/uploads
     volumes:
       - ./data/uploads:/app/uploads:rw
-    ports:
-      - "8080:8080"
 volumes:
   pgdata:

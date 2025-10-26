@@ -2,6 +2,7 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -23,7 +24,12 @@ const (
 )
 
 type PhotosHandler struct {
-	Svc *domain.Service
+	// Svc is any type that can save meter photo metadata. Use an interface
+	// so tests can inject a fake implementation without depending on the
+	// concrete domain.Service type.
+	Svc interface {
+		SaveMeterPhoto(ctx context.Context, photo *domain.MeterPhoto) error
+	}
 	// Dir is the directory to store uploaded photos (local disk for now)
 	Dir string
 }
@@ -53,8 +59,6 @@ func (h *PhotosHandler) Upload(w http.ResponseWriter, r *http.Request) {
 
 	// Determine directory: handler.Dir -> env -> default
 	dir := h.Dir
-	fmt.Printf("Upload dir before checks: %s\n", dir)
-
 	// Ensure directory exists
 	if err := os.MkdirAll(dir, 0755); err != nil {
 		http.Error(w, "failed to save photo", http.StatusInternalServerError)

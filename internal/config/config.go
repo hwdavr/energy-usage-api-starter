@@ -6,27 +6,33 @@ import (
 )
 
 type Config struct {
-	Addr        string
-	DatabaseURL string
-	JWTSecret   string
+	Addr           string
+	DatabaseURL    string
+	JWTSecret      string
+	PhotoUploadDir string
 }
 
 func FromEnv() Config {
 	c := Config{
-		Addr:        getenv("ADDR", ":8080"),
-		DatabaseURL: must("DATABASE_URL"),
-		JWTSecret:   must("JWT_SECRET"),
+		Addr:           getenv("ADDR", ":8080"),
+		DatabaseURL:    must("DATABASE_URL"),
+		JWTSecret:      must("JWT_SECRET"),
+		PhotoUploadDir: getenv("PHOTO_UPLOAD_DIR", "./uploads"),
 	}
 	return c
 }
 
 func getenv(k, def string) string {
-	if v := os.Getenv(k); v != "" { return v }
+	if v := os.Getenv(k); v != "" {
+		return v
+	}
 	return def
 }
 
 func must(k string) string {
 	v := os.Getenv(k)
-	if v == "" { log.Fatalf("missing required env %s", k) }
+	if v == "" {
+		log.Fatalf("missing required env %s", k)
+	}
 	return v
 }

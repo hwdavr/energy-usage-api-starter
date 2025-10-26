@@ -8,13 +8,16 @@ import (
 	"github.com/yourname/energy-usage-api/internal/http/handlers"
 )
 
-func NewRouter(ah *handlers.AuthHandler, mh *handlers.MetersHandler, rh *handlers.ReadingsHandler, secret string) http.Handler {
+func NewRouter(ah *handlers.AuthHandler, mh *handlers.MetersHandler, rh *handlers.ReadingsHandler, ph *handlers.PhotosHandler, secret string) http.Handler {
 	r := chi.NewRouter()
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins: []string{"*"},
 		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders: []string{"Authorization", "Content-Type"},
 	}))
+
+	// register request/response logging middleware
+	//r.Use(RequestResponseLogger())
 
 	r.Post("/v1/auth/signup", ah.Signup)
 	r.Post("/v1/auth/login", ah.Login)
@@ -26,6 +29,8 @@ func NewRouter(ah *handlers.AuthHandler, mh *handlers.MetersHandler, rh *handler
 			api.Post("/meters", mh.Create)
 			api.Post("/meters/{meterID}/readings", rh.Add)
 			api.Get("/meters/{meterID}/usage", rh.Usage)
+			// Meter photo upload endpoints
+			api.Post("/meters/{meterID}/photos/{type}", ph.Upload) // type: faulty|fixed
 		})
 	})
 

@@ -61,3 +61,12 @@ func (r *Repository) UsageSum(ctx context.Context, meterID string, from, to time
 	`, meterID, from, to)
 	return total, err
 }
+
+// SaveMeterPhoto persists meter photo metadata.
+func (r *Repository) SaveMeterPhoto(ctx context.Context, photo *MeterPhoto) error {
+	return r.DB.QueryRowxContext(ctx, `
+		INSERT INTO meter_photos (meter_id, user_id, type, path, created_at)
+		VALUES ($1, $2, $3, $4, $5)
+		RETURNING id
+	`, photo.MeterID, photo.UserID, photo.Type, photo.Path, photo.CreatedAt).Scan(&photo.ID)
+}

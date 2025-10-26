@@ -18,15 +18,19 @@ func main() {
 	defer log.Sync()
 
 	pg, err := db.Connect(cfg.DatabaseURL)
-	if err != nil { log.Fatal("db connect", zap.Error(err)) }
+	if err != nil {
+		log.Fatal("db connect", zap.Error(err))
+	}
 
 	repo := domain.NewRepository(pg)
-	svc  := domain.NewService(repo)
+	svc := domain.NewService(repo)
 
 	ah := handlers.NewAuthHandler(svc, cfg.JWTSecret)
 	mh := &handlers.MetersHandler{Svc: svc}
 	rh := &handlers.ReadingsHandler{Svc: svc}
-	router := apihttp.NewRouter(ah, mh, rh, cfg.JWTSecret)
+	ph := &handlers.PhotosHandler{Svc: svc, Dir: cfg.PhotoUploadDir}
+
+	router := apihttp.NewRouter(ah, mh, rh, ph, cfg.JWTSecret)
 
 	log.Info("server starting", zap.String("addr", cfg.Addr))
 	if err := stdhttp.ListenAndServe(cfg.Addr, router); err != nil {

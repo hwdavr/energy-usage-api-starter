@@ -231,3 +231,9 @@ curl -s -X POST http://localhost:8080/v1/meters/$MID/readings \
 
 curl -s "http://localhost:8080/v1/meters/$MID/usage?from=2025-10-01T00:00:00Z&to=2025-10-05T00:00:00Z" \
   -H "Authorization: Bearer $TOKEN" | jq .
+
+6. Upload photo
+
+curl -v -X POST "http://localhost:8080/v1/meters/<METER_ID>/photos/faulty" \
+  -H "Authorization: Bearer <JWT>" \
+  -F "photo=@/path/to/photo.jpg"

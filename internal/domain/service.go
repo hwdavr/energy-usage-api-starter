@@ -5,6 +5,7 @@ import (
 	"errors"
 	"time"
 
+	// other imports
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -18,7 +19,9 @@ func (s *Service) Signup(ctx context.Context, email, password string) (User, err
 }
 func (s *Service) VerifyUser(ctx context.Context, email, password string) (User, error) {
 	u, err := s.Repo.FindUserByEmail(ctx, email)
-	if err != nil { return User{}, err }
+	if err != nil {
+		return User{}, err
+	}
 	if bcrypt.CompareHashAndPassword([]byte(u.PasswordHash), []byte(password)) != nil {
 		return User{}, errors.New("invalid credentials")
 	}
@@ -36,4 +39,9 @@ func (s *Service) AddReading(ctx context.Context, meterID string, kwh float64, a
 }
 func (s *Service) Usage(ctx context.Context, meterID string, from, to time.Time) (float64, error) {
 	return s.Repo.UsageSum(ctx, meterID, from, to)
+}
+
+// SaveMeterPhoto stores meter photo metadata.
+func (s *Service) SaveMeterPhoto(ctx context.Context, photo *MeterPhoto) error {
+	return s.Repo.SaveMeterPhoto(ctx, photo)
 }
